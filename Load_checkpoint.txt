@@ -1,0 +1,29 @@
+import glob
+import tensorflow as tf
+
+def load_best_checkpoint(checkpoint_dir, metric='val_loss', mode='min'):
+    # Get a list of all checkpoint files in the directory
+    checkpoint_files = glob.glob(checkpoint_dir + "weights-*")
+
+    # Sort the checkpoint files based on the metric value
+    checkpoint_files.sort(key=lambda x: float(x.split("-")[-1]))
+
+    # Select the best checkpoint file based on the metric and mode
+    if mode == 'min':
+        best_checkpoint_file = checkpoint_files[0]
+    elif mode == 'max':
+        best_checkpoint_file = checkpoint_files[-1]
+    else:
+        raise ValueError("Invalid mode. Must be 'min' or 'max'.")
+
+    # Load the weights from the best checkpoint file
+    model = create_model()  # Instantiate your model
+    model.load_weights(best_checkpoint_file)
+
+    return model
+
+# Usage example:
+checkpoint_dir = "/content/drive/MyDrive/SkimLit_NPL/pubmed-rct/checkpoints/"
+loaded_model = load_best_checkpoint(checkpoint_dir, metric='val_loss', mode='min')
+
+# Use the loaded_model for further training or evaluation
